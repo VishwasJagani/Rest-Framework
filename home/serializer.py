@@ -64,13 +64,11 @@ class PersonSerializer(serializers.ModelSerializer):
     # To pass extra data without adding field in model
 
     def get_color_info(self, obj):
-        print(obj)
         color_obj = Color.objects.get(id=obj.color.id)
         return {'Color_Name': color_obj.color_name, "HEX_Code": '#000'}
 
     # To Validate name and age field
     def validate(self, data):
-        print(data)
         specialchar = '!@#$%^&*()_-+=?,.<>~`'
         if any(c in specialchar for c in data['name']):
             raise serializers.ValidationError("Special Char Not Allowed")

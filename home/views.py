@@ -3,26 +3,29 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 from django.contrib.auth import authenticate
 from home.models import *
 from home.serializer import *
 
 
-@api_view(['POST'])
-def login(request):
-    try:
-        data = request.data
-        serializer = LoginSerializer(data=data)
+# @api_view(['POST'])
+# def login(request):
+    # try:
+    #     data = request.data
+    #     serializer = LoginSerializer(data=data)
 
-        if serializer.is_valid():
-            data = serializer.validated_data
-            return Response({"Message": "Success"})
+    #     if serializer.is_valid():
+    #         data = serializer.validated_data
+    #         return Response({"Message": "Success"})
 
-        return Response(serializer.errors)
+    #     return Response(serializer.errors)
 
-    except Exception as error:
-        return Response(error)
+    # except Exception as error:
+    #     return Response(error)
 
 
 @api_view(['GET', 'POST', 'PUT'])
@@ -56,7 +59,10 @@ def index(request):
 
 @api_view(['GET', 'POST'])
 def people(request):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     if request.method == "GET":
+        print(request.user)
         data = person.objects.all()
         serializer = PersonSerializer(data, many=True)
         return Response(serializer.data)
@@ -189,6 +195,7 @@ class LoginAPI(APIView):
         serializer = LoginSerializer(data=data)
         if serializer.is_valid():
             user = authenticate(username=serializer.data['username'],password = serializer.data['password'])
-            return Response({"status": True, "Message": "Successfull"}, status.HTTP_201_CREATED)
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({"status": True, "Message": "Successfull","token":str(token)}, status.HTTP_201_CREATED)
 
         return Response({"status": False, "message": serializer.errors}, status.HTTP_400_BAD_REQUEST)

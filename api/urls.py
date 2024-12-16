@@ -14,11 +14,12 @@ urlpatterns = [
     path('edit_people/', edit_people),
     path('delete/', delete),
     path('color/', color),
-    path('login/', login),
+    # path('login/', login),
 
     # For Class based view
     path('person-api/', PersonApi.as_view()),
     path('register/', RegisterAPI.as_view()),
+    path('login/', LoginAPI.as_view()),
 
     #For Viewset class
     path('',include(router.urls)),
